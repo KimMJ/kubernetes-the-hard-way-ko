@@ -1,16 +1,16 @@
 # Deploying the DNS Cluster Add-on
 
-In this lab you will deploy the [DNS add-on](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/) which provides DNS based service discovery, backed by [CoreDNS](https://coredns.io/), to applications running inside the Kubernetes cluster.
+이 랩에서는 [CoreDNS](https://coredns.io/)을 통한 service discovery를 기반으로 DNS를 제공해주는 [DNS add-on](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/)을 쿠버네티스 클러스터 내에 동작하는 어플리케이션에 배포합니다.
 
 ## The DNS Cluster Add-on
 
-Deploy the `coredns` cluster add-on:
+`coredns` 클러스터 add-on을 배포합니다:
 
-```
+```bash
 kubectl apply -f https://storage.googleapis.com/kubernetes-the-hard-way/coredns.yaml
 ```
 
-> output
+> 결과
 
 ```
 serviceaccount/coredns created
@@ -21,13 +21,13 @@ deployment.extensions/coredns created
 service/kube-dns created
 ```
 
-List the pods created by the `kube-dns` deployment:
+`kube-dns` deployment에 의해 생성된 파드의 리스트를 확인합니다:
 
-```
+```bash
 kubectl get pods -l k8s-app=kube-dns -n kube-system
 ```
 
-> output
+> 결과
 
 ```
 NAME                       READY   STATUS    RESTARTS   AGE
@@ -37,38 +37,38 @@ coredns-699f8ddd77-gtcgb   1/1     Running   0          20s
 
 ## Verification
 
-Create a `busybox` deployment:
+`busybox` deployment를 생성합니다:
 
-```
+```bash
 kubectl run --generator=run-pod/v1 busybox --image=busybox:1.28 --command -- sleep 3600
 ```
 
-List the pod created by the `busybox` deployment:
+`busybox` deployment에 의해 생성된 파드의 리스트를 확인합니다:
 
-```
+```bash
 kubectl get pods -l run=busybox
 ```
 
-> output
+> 결과
 
 ```
 NAME      READY   STATUS    RESTARTS   AGE
 busybox   1/1     Running   0          3s
 ```
 
-Retrieve the full name of the `busybox` pod:
+`busybox` 파드의 전체 이름을 불러옵니다:
 
-```
+```bash
 POD_NAME=$(kubectl get pods -l run=busybox -o jsonpath="{.items[0].metadata.name}")
 ```
 
-Execute a DNS lookup for the `kubernetes` service inside the `busybox` pod:
+`busybox` 파드 내부에서 `kubernetes` 서비스에 대해 DNS lookup을 실행합니다:
 
-```
+```bash
 kubectl exec -ti $POD_NAME -- nslookup kubernetes
 ```
 
-> output
+> 결과
 
 ```
 Server:    10.32.0.10
@@ -78,4 +78,4 @@ Name:      kubernetes
 Address 1: 10.32.0.1 kubernetes.default.svc.cluster.local
 ```
 
-Next: [Smoke Test](13-smoke-test.md)
+다음: [Smoke Test](13-smoke-test.md)

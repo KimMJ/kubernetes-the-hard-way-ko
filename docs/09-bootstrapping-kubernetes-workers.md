@@ -1,53 +1,53 @@
 # Bootstrapping the Kubernetes Worker Nodes
 
-In this lab you will bootstrap three Kubernetes worker nodes. The following components will be installed on each node: [runc](https://github.com/opencontainers/runc), [container networking plugins](https://github.com/containernetworking/cni), [containerd](https://github.com/containerd/containerd), [kubelet](https://kubernetes.io/docs/admin/kubelet), and [kube-proxy](https://kubernetes.io/docs/concepts/cluster-administration/proxies).
+이 랩에서는 세 쿠버네티스 워커 노드를 부트스트랩 할 것입니다. 다음의 컴포넌트들이 각 노드에 설치되어 있어야 합니다: [runc](https://github.com/opencontainers/runc), [container networking plugins](https://github.com/containernetworking/cni), [containerd](https://github.com/containerd/containerd), [kubelet](https://kubernetes.io/docs/admin/kubelet), [kube-proxy](https://kubernetes.io/docs/concepts/cluster-administration/proxies).
 
 ## Prerequisites
 
-The commands in this lab must be run on each worker instance: `worker-0`, `worker-1`, and `worker-2`. Login to each worker instance using the `gcloud` command. Example:
+이 랩에서의 명령어들은 반드시 각 worker instance에서 실행되어야 합니다: `worker-0`, `worker-1`, `worker-2`. `gcloud` 명령어로 각 worker instance에 로그인합니다. 예를 들어:
 
-```
+```bash
 gcloud compute ssh worker-0
 ```
 
-### Running commands in parallel with tmux
+### tmux를 통해 명령어를 동시에 수행하기
 
-[tmux](https://github.com/tmux/tmux/wiki) can be used to run commands on multiple compute instances at the same time. See the [Running commands in parallel with tmux](01-prerequisites.md#running-commands-in-parallel-with-tmux) section in the Prerequisites lab.
+[tmux](https://github.com/tmux/tmux/wiki)는 여러 compute instance들에 대해 동시에 명령어를 실행시킬 때 사용할 수 있습니다. Prerequisites 랩에서 [Running commands in parallel with tmux](01-prerequisites.md#running-commands-in-parallel-with-tmux) 섹션을 확인하세요. 
 
 ## Provisioning a Kubernetes Worker Node
 
-Install the OS dependencies:
+OS dependency들을 설치합니다:
 
-```
+```bash
 {
   sudo apt-get update
   sudo apt-get -y install socat conntrack ipset
 }
 ```
 
-> The socat binary enables support for the `kubectl port-forward` command.
+> socat 바이너리는 `kubectl port-forward` 명령어를 가능하게 만들어줍니다.
 
-### Disable Swap
+### Swap 비활성화
 
-By default the kubelet will fail to start if [swap](https://help.ubuntu.com/community/SwapFaq) is enabled. It is [recommended](https://github.com/kubernetes/kubernetes/issues/7294) that swap be disabled to ensure Kubernetes can provide proper resource allocation and quality of service.
+기본적으로 kubelet은 [swap](https://help.ubuntu.com/community/SwapFaq)이 활성화 되어있을 경우 시작이 실패하게 됩니다. 쿠버네티스가 올바른 리소스 할당과 서비스의 퀄리티를 제공하도록 하기 위해 swap을 비활성화 하는것은 [추천](https://github.com/kubernetes/kubernetes/issues/7294) 사항입니다.
 
-Verify if swap is enabled:
+swap이 활성화 되어있는지 확인하세요:
 
-```
+```bash
 sudo swapon --show
 ```
 
-If output is empthy then swap is not enabled. If swap is enabled run the following command to disable swap immediately:
+결과가 비어있다면 swap은 활성화되지 않은 것입니다. swap이 활성화되어있으면 다음의 명령어를 통해 swap을 즉시 비활성화할 수 있습니다:
 
-```
+```bash
 sudo swapoff -a
 ```
 
-> To ensure swap remains off after reboot consult your Linux distro documentation.
+> swap이 재부팅 후에도 off 상태로 유지되도록 하려면 Linux distro 문서를 확인하세요.
 
-### Download and Install Worker Binaries
+### Worker Binaries 다운로드 및 설치
 
-```
+```bash
 wget -q --show-progress --https-only --timestamping \
   https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.15.0/crictl-v1.15.0-linux-amd64.tar.gz \
   https://github.com/opencontainers/runc/releases/download/v1.0.0-rc8/runc.amd64 \
@@ -58,9 +58,9 @@ wget -q --show-progress --https-only --timestamping \
   https://storage.googleapis.com/kubernetes-release/release/v1.15.3/bin/linux/amd64/kubelet
 ```
 
-Create the installation directories:
+설치 디렉토리를 생성하세요:
 
-```
+```bash
 sudo mkdir -p \
   /etc/cni/net.d \
   /opt/cni/bin \
@@ -70,9 +70,9 @@ sudo mkdir -p \
   /var/run/kubernetes
 ```
 
-Install the worker binaries:
+워커 바이너리들을 설치하세요:
 
-```
+```bash
 {
   mkdir containerd
   tar -xvf crictl-v1.15.0-linux-amd64.tar.gz
@@ -85,18 +85,18 @@ Install the worker binaries:
 }
 ```
 
-### Configure CNI Networking
+### CNI 네트워킹 설정하기
 
-Retrieve the Pod CIDR range for the current compute instance:
+현재 compute instance에 대한 파드 CIDR range를 불러오세요:
 
-```
+```bash
 POD_CIDR=$(curl -s -H "Metadata-Flavor: Google" \
   http://metadata.google.internal/computeMetadata/v1/instance/attributes/pod-cidr)
 ```
 
-Create the `bridge` network configuration file:
+`bridge` 네트워크 설정 파일을 생성하세요:
 
-```
+```bash
 cat <<EOF | sudo tee /etc/cni/net.d/10-bridge.conf
 {
     "cniVersion": "0.3.1",
@@ -116,9 +116,9 @@ cat <<EOF | sudo tee /etc/cni/net.d/10-bridge.conf
 EOF
 ```
 
-Create the `loopback` network configuration file:
+`loopback` 네트워크 설정 파일을 생성하세요:
 
-```
+```bash
 cat <<EOF | sudo tee /etc/cni/net.d/99-loopback.conf
 {
     "cniVersion": "0.3.1",
@@ -128,15 +128,15 @@ cat <<EOF | sudo tee /etc/cni/net.d/99-loopback.conf
 EOF
 ```
 
-### Configure containerd
+### containerd 설정하기
 
-Create the `containerd` configuration file:
+`containerd` 설정 파일을 생성하세요:
 
-```
+```bash
 sudo mkdir -p /etc/containerd/
 ```
 
-```
+```bash
 cat << EOF | sudo tee /etc/containerd/config.toml
 [plugins]
   [plugins.cri.containerd]
@@ -148,9 +148,9 @@ cat << EOF | sudo tee /etc/containerd/config.toml
 EOF
 ```
 
-Create the `containerd.service` systemd unit file:
+`containerd.service` systemd unit 파일을 생성하세요:
 
-```
+```bash
 cat <<EOF | sudo tee /etc/systemd/system/containerd.service
 [Unit]
 Description=containerd container runtime
@@ -174,9 +174,9 @@ WantedBy=multi-user.target
 EOF
 ```
 
-### Configure the Kubelet
+### Kubelet 설정하기
 
-```
+```bash
 {
   sudo mv ${HOSTNAME}-key.pem ${HOSTNAME}.pem /var/lib/kubelet/
   sudo mv ${HOSTNAME}.kubeconfig /var/lib/kubelet/kubeconfig
@@ -184,9 +184,9 @@ EOF
 }
 ```
 
-Create the `kubelet-config.yaml` configuration file:
+`kubelet-config.yaml` 설정 파일을 생성하세요:
 
-```
+```bash
 cat <<EOF | sudo tee /var/lib/kubelet/kubelet-config.yaml
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -210,11 +210,11 @@ tlsPrivateKeyFile: "/var/lib/kubelet/${HOSTNAME}-key.pem"
 EOF
 ```
 
-> The `resolvConf` configuration is used to avoid loops when using CoreDNS for service discovery on systems running `systemd-resolved`. 
+> `resolvConf` 설정은 `systemd-resolved`를 동작시키는 시스템에서 CoreDNS를 service discovery로 사용할 때 loop들을 피하기 위하여 사용됩니다.
 
-Create the `kubelet.service` systemd unit file:
+`kubelet.service` systemd unit 파일을 생성하세요:
 
-```
+```bash
 cat <<EOF | sudo tee /etc/systemd/system/kubelet.service
 [Unit]
 Description=Kubernetes Kubelet
@@ -240,15 +240,15 @@ WantedBy=multi-user.target
 EOF
 ```
 
-### Configure the Kubernetes Proxy
+### Kubernetes Proxy 설정하기
 
-```
+```bash
 sudo mv kube-proxy.kubeconfig /var/lib/kube-proxy/kubeconfig
 ```
 
-Create the `kube-proxy-config.yaml` configuration file:
+`kube-proxy-config.yaml` 설정 파일을 생성하세요:
 
-```
+```bash
 cat <<EOF | sudo tee /var/lib/kube-proxy/kube-proxy-config.yaml
 kind: KubeProxyConfiguration
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
@@ -259,9 +259,9 @@ clusterCIDR: "10.200.0.0/16"
 EOF
 ```
 
-Create the `kube-proxy.service` systemd unit file:
+`kube-proxy.service` systemd unit 파일을 생성하세요:
 
-```
+```bash
 cat <<EOF | sudo tee /etc/systemd/system/kube-proxy.service
 [Unit]
 Description=Kubernetes Kube Proxy
@@ -278,9 +278,9 @@ WantedBy=multi-user.target
 EOF
 ```
 
-### Start the Worker Services
+### Worker Services 시작하기
 
-```
+```bash
 {
   sudo systemctl daemon-reload
   sudo systemctl enable containerd kubelet kube-proxy
@@ -288,20 +288,22 @@ EOF
 }
 ```
 
-> Remember to run the above commands on each worker node: `worker-0`, `worker-1`, and `worker-2`.
+> 위의 명령어들을 각 워커 노드들에 대해 실행해야 함을 기억하세요: `worker-0`, `worker-1`, `worker-2`
 
-## Verification
+## 검증
 
-> The compute instances created in this tutorial will not have permission to complete this section. Run the following commands from the same machine used to create the compute instances.
+> 이 튜토리얼에서 생성된 compute instance들은 이 섹션을 할 수 있는 권한을 가지고 있지 않습니다. 다음의 명령어들은 compute instance들을 생성했을 때 사용했던 것과 동일한 머신에서 진행하시기 바랍니다.
 
-List the registered Kubernetes nodes:
+> 역자 주) 로컬 컴퓨터에서 진행하시면 됩니다.
 
-```
+등록된 쿠버네티스 노드 리스트를 확인하세요:
+
+```bash
 gcloud compute ssh controller-0 \
   --command "kubectl get nodes --kubeconfig admin.kubeconfig"
 ```
 
-> output
+> 결과
 
 ```
 NAME       STATUS   ROLES    AGE   VERSION
@@ -310,4 +312,4 @@ worker-1   Ready    <none>   15s   v1.15.3
 worker-2   Ready    <none>   15s   v1.15.3
 ```
 
-Next: [Configuring kubectl for Remote Access](10-configuring-kubectl.md)
+다음: [Configuring kubectl for Remote Access](10-configuring-kubectl.md)

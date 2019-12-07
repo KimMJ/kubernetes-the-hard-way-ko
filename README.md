@@ -1,10 +1,10 @@
 # Kubernetes The Hard Way
 
-This tutorial walks you through setting up Kubernetes the hard way. This guide is not for people looking for a fully automated command to bring up a Kubernetes cluster. If that's you then check out [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine), or the [Getting Started Guides](https://kubernetes.io/docs/setup).
+이 튜토리얼에서는 쿠버네티스를 약간은 어려운 방법으로 설정하는 것을 배웁니다. 이 가이드는 쿠버네티스 클러스터를 생성하는 완전히 자동화된 커맨드를 찾으려는 사람들에게는 적합하지 않습니다. 만약 그런 커맨드를 찾고자 한다면 [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine) 또는 [Getting Started Guides](https://kubernetes.io/docs/setup)를 확인하시기 바랍니다.
 
-Kubernetes The Hard Way is optimized for learning, which means taking the long route to ensure you understand each task required to bootstrap a Kubernetes cluster.
+Kubernetes The Hard Way는 학습에 특화되어 있으며 이는 쿠버네티스 클러스터를 부트스트랩 하는데 필요한 각 task를 이해하는 데 긴 시간이 필요함을 의미합니다.
 
-> The results of this tutorial should not be viewed as production ready, and may receive limited support from the community, but don't let that stop you from learning!
+> 이 튜토리얼에서 나온 결과물은 실제 프로덕션을 고려할 때 완벽하다고 볼 수 없으며 커뮤니티로부터 지원을 받는데 제한이 있을 수 있습니다. 하지만 배움을 멈추지는 마십시오!
 
 ## Copyright
 
@@ -13,11 +13,11 @@ Kubernetes The Hard Way is optimized for learning, which means taking the long r
 
 ## Target Audience
 
-The target audience for this tutorial is someone planning to support a production Kubernetes cluster and wants to understand how everything fits together.
+이 튜토리얼의 타겟은 어떻게 모든 것들이 작동하는지 이해하고 싶어하는, 프로덕션 쿠버네티스 클러스터를 지원해야 하는 누군가를 위한 것입니다.
 
 ## Cluster Details
 
-Kubernetes The Hard Way guides you through bootstrapping a highly available Kubernetes cluster with end-to-end encryption between components and RBAC authentication.
+Kubernetes The Hard Way는 end-to-end 컴포넌트 사이의 암호화와 RBAC 인증을 하는, 고가용성을 지원하는 쿠버네티스 클러스터를 부트스트래핑하도록 가이드할 것입니다.
 
 * [kubernetes](https://github.com/kubernetes/kubernetes) 1.15.3
 * [containerd](https://github.com/containerd/containerd) 1.2.9
@@ -27,7 +27,7 @@ Kubernetes The Hard Way guides you through bootstrapping a highly available Kube
 
 ## Labs
 
-This tutorial assumes you have access to the [Google Cloud Platform](https://cloud.google.com). While GCP is used for basic infrastructure requirements the lessons learned in this tutorial can be applied to other platforms.
+이 튜토리얼에서는 [Google Cloud Platform](https://cloud.google.com)에 접근 권한이 있다고 가정합니다. GCP가 기본 infrastructure로 사용되고 있지만 이 튜토리얼에서 배운 점들은 다른 플랫폼에 대해서도 적용할 수 있습니다. 
 
 * [Prerequisites](docs/01-prerequisites.md)
 * [Installing the Client Tools](docs/02-client-tools.md)

@@ -1,16 +1,16 @@
 # Configuring kubectl for Remote Access
 
-In this lab you will generate a kubeconfig file for the `kubectl` command line utility based on the `admin` user credentials.
+이 랩에서는 `admin` 유저 credential들을 기반으로 `kubectl` 명령어 도구를 위한 kubeconfig 파일을 생성할 것입니다.
 
-> Run the commands in this lab from the same directory used to generate the admin client certificates.
+> 이 랩에서는 명령어들을 admin client certificate들을 생성했을 때와 동일한 디렉토리에서 진행하면 됩니다.
 
 ## The Admin Kubernetes Configuration File
 
-Each kubeconfig requires a Kubernetes API Server to connect to. To support high availability the IP address assigned to the external load balancer fronting the Kubernetes API Servers will be used.
+각 kubeconfig는 연결할 쿠버네티스 API 서버를 필요로 합니다. 고가용성을 지원하기 위해 쿠버네티스 API 서버 앞단에 있는 외부 load balancer로 할당된 IP 주소를 사용해야합니다.
 
-Generate a kubeconfig file suitable for authenticating as the `admin` user:
+`admin` 유저로 인증하기에 적합한 kubeconfig 파일을 생성하세요:
 
-```
+```bash
 {
   KUBERNETES_PUBLIC_ADDRESS=$(gcloud compute addresses describe kubernetes-the-hard-way \
     --region $(gcloud config get-value compute/region) \
@@ -33,15 +33,15 @@ Generate a kubeconfig file suitable for authenticating as the `admin` user:
 }
 ```
 
-## Verification
+## 검증
 
-Check the health of the remote Kubernetes cluster:
+원격 쿠버네티스 클러스터의 health를 체크하세요:
 
-```
+```bash
 kubectl get componentstatuses
 ```
 
-> output
+> 결과
 
 ```
 NAME                 STATUS    MESSAGE             ERROR
@@ -52,13 +52,13 @@ etcd-2               Healthy   {"health":"true"}
 etcd-0               Healthy   {"health":"true"}
 ```
 
-List the nodes in the remote Kubernetes cluster:
+원격 쿠버네티스 클러스터의 노드 리스트를 확인하세요:
 
 ```
 kubectl get nodes
 ```
 
-> output
+> 결과
 
 ```
 NAME       STATUS   ROLES    AGE    VERSION
@@ -67,4 +67,4 @@ worker-1   Ready    <none>   2m9s   v1.15.3
 worker-2   Ready    <none>   2m9s   v1.15.3
 ```
 
-Next: [Provisioning Pod Network Routes](11-pod-network-routes.md)
+다음: [Provisioning Pod Network Routes](11-pod-network-routes.md)

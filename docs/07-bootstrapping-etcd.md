@@ -1,64 +1,64 @@
 # Bootstrapping the etcd Cluster
 
-Kubernetes components are stateless and store cluster state in [etcd](https://github.com/etcd-io/etcd). In this lab you will bootstrap a three node etcd cluster and configure it for high availability and secure remote access.
+쿠버네티스 컴포넌트는 stateless이고 클러스터의 상태를 [etcd](https://github.com/etcd-io/etcd)에 저장합니다. 이 랩에서는 세 노드의 etcd 클러스터를 부트스트랩하고 이를 고가용성과 보안 원격 접속을 고려하여 설정합니다.
 
 ## Prerequisites
 
-The commands in this lab must be run on each controller instance: `controller-0`, `controller-1`, and `controller-2`. Login to each controller instance using the `gcloud` command. Example:
+이 랩에서의 커맨드는 반드시 각 controller instance에서 실행되어야 합니다: `controller-0`, `controller-1`, `controller-2`. 각 controller instance에 `gcloud` 명령어를 통해 로그인하십시오. 예를 들어:
 
-```
+```bash
 gcloud compute ssh controller-0
 ```
 
-### Running commands in parallel with tmux
+### tmux를 통해 명령어를 동시에 수행하기
 
-[tmux](https://github.com/tmux/tmux/wiki) can be used to run commands on multiple compute instances at the same time. See the [Running commands in parallel with tmux](01-prerequisites.md#running-commands-in-parallel-with-tmux) section in the Prerequisites lab.
+[tmux](https://github.com/tmux/tmux/wiki)는 여러 compute instance들에 대해 동시에 명령어를 실행시킬 때 사용할 수 있습니다. Prerequisites 랩에서 [Running commands in parallel with tmux](01-prerequisites.md#running-commands-in-parallel-with-tmux) 섹션을 확인하세요. 
 
 ## Bootstrapping an etcd Cluster Member
 
-### Download and Install the etcd Binaries
+### etcd 바이너리 다운로드 및 설치
 
-Download the official etcd release binaries from the [etcd](https://github.com/etcd-io/etcd) GitHub project:
+공식 etcd 릴리즈 바이너리를 [etcd](https://github.com/etcd-io/etcd) GitHub project에서 다운로드 받으세요:
 
-```
+```bash
 wget -q --show-progress --https-only --timestamping \
   "https://github.com/etcd-io/etcd/releases/download/v3.4.0/etcd-v3.4.0-linux-amd64.tar.gz"
 ```
 
-Extract and install the `etcd` server and the `etcdctl` command line utility:
+`etcd` 서버와 `etcdctl` 명령어 도구를 추출하고 설치합니다:
 
-```
+```bash
 {
   tar -xvf etcd-v3.4.0-linux-amd64.tar.gz
   sudo mv etcd-v3.4.0-linux-amd64/etcd* /usr/local/bin/
 }
 ```
 
-### Configure the etcd Server
+### etcd Server 설정
 
-```
+```bash
 {
   sudo mkdir -p /etc/etcd /var/lib/etcd
   sudo cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd/
 }
 ```
 
-The instance internal IP address will be used to serve client requests and communicate with etcd cluster peers. Retrieve the internal IP address for the current compute instance:
+instance 내부 IP 주소는 client request을 처리하고 etcd cluster peer들과 통신하는 데 사용됩니다:
 
-```
+```bash
 INTERNAL_IP=$(curl -s -H "Metadata-Flavor: Google" \
   http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip)
 ```
 
-Each etcd member must have a unique name within an etcd cluster. Set the etcd name to match the hostname of the current compute instance:
+각 etcd 멤버는 반드시 etcd 클러스터 내에서 유일한 이름을 가지고 있어야 합니다. etcd 이름을 현재 compute instance의 hostname과 일치하도록 설정합니다.
 
-```
+```bash
 ETCD_NAME=$(hostname -s)
 ```
 
-Create the `etcd.service` systemd unit file:
+`etcd.service` systemd unit file을 생성합니다:
 
-```
+```bash
 cat <<EOF | sudo tee /etc/systemd/system/etcd.service
 [Unit]
 Description=etcd
@@ -92,9 +92,9 @@ WantedBy=multi-user.target
 EOF
 ```
 
-### Start the etcd Server
+### etcd Server 시작하기
 
-```
+```bash
 {
   sudo systemctl daemon-reload
   sudo systemctl enable etcd
@@ -102,13 +102,13 @@ EOF
 }
 ```
 
-> Remember to run the above commands on each controller node: `controller-0`, `controller-1`, and `controller-2`.
+> 위의 명령어들은 각 controller node에서 실행되어야 함을 기억합시다: `controller-0`, `controller-1`, `controller-2`
 
-## Verification
+## 검증
 
-List the etcd cluster members:
+etcd 클러스터 멤버 리스트를 확인합니다:
 
-```
+```bash
 sudo ETCDCTL_API=3 etcdctl member list \
   --endpoints=https://127.0.0.1:2379 \
   --cacert=/etc/etcd/ca.pem \
@@ -116,7 +116,7 @@ sudo ETCDCTL_API=3 etcdctl member list \
   --key=/etc/etcd/kubernetes-key.pem
 ```
 
-> output
+> 결과
 
 ```
 3a57933972cb5131, started, controller-2, https://10.240.0.12:2380, https://10.240.0.12:2379
@@ -124,4 +124,4 @@ f98dc20bce6225a0, started, controller-0, https://10.240.0.10:2380, https://10.24
 ffed16798470cab5, started, controller-1, https://10.240.0.11:2380, https://10.240.0.11:2379
 ```
 
-Next: [Bootstrapping the Kubernetes Control Plane](08-bootstrapping-kubernetes-controllers.md)
+다음: [Bootstrapping the Kubernetes Control Plane](08-bootstrapping-kubernetes-controllers.md)

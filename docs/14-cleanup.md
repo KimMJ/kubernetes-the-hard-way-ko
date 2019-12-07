@@ -1,12 +1,12 @@
 # Cleaning Up
 
-In this lab you will delete the compute resources created during this tutorial.
+이 랩에서는 튜토리얼을 진행하는 동안 생성했던 compute resource들을 삭제합니다.
 
 ## Compute Instances
 
-Delete the controller and worker compute instances:
+controller와 worker compute instance들을 삭제합니다:
 
-```
+```bash
 gcloud -q compute instances delete \
   controller-0 controller-1 controller-2 \
   worker-0 worker-1 worker-2 \
@@ -15,9 +15,9 @@ gcloud -q compute instances delete \
 
 ## Networking
 
-Delete the external load balancer network resources:
+외부 load balancer 네트워크 리소스를 삭제합니다:
 
-```
+```bash
 {
   gcloud -q compute forwarding-rules delete kubernetes-forwarding-rule \
     --region $(gcloud config get-value compute/region)
@@ -30,9 +30,9 @@ Delete the external load balancer network resources:
 }
 ```
 
-Delete the `kubernetes-the-hard-way` firewall rules:
+`kubernetes-the-hard-way` 방화벽 규칙을 삭제합니다:
 
-```
+```bash
 gcloud -q compute firewall-rules delete \
   kubernetes-the-hard-way-allow-nginx-service \
   kubernetes-the-hard-way-allow-internal \
@@ -40,9 +40,9 @@ gcloud -q compute firewall-rules delete \
   kubernetes-the-hard-way-allow-health-check
 ```
 
-Delete the `kubernetes-the-hard-way` network VPC:
+`kubernetes-the-hard-way` 네트워크 VPC를 삭제합니다:
 
-```
+```bash
 {
   gcloud -q compute routes delete \
     kubernetes-route-10-200-0-0-24 \
