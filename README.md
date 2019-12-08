@@ -1,6 +1,10 @@
+# Kubernetes The Hard Way Korean Ver.
+
+이 프로젝트는 [Kubernetes The Hard Way](https://github.com/kelseyhightower/kubernetes-the-hard-way) 를 한글화 한 것입니다. 영어를 잘하는 편이 아니기 때문에 해석이 매끄럽지 않을 수 있습니다. 언제든 알려주시면 수정 및 반영하도록 하겠습니다.
+
 # Kubernetes The Hard Way
 
-이 튜토리얼에서는 쿠버네티스를 약간은 어려운 방법으로 설정하는 것을 배웁니다. 이 가이드는 쿠버네티스 클러스터를 생성하는 완전히 자동화된 커맨드를 찾으려는 사람들에게는 적합하지 않습니다. 만약 그런 커맨드를 찾고자 한다면 [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine) 또는 [Getting Started Guides](https://kubernetes.io/docs/setup)를 확인하시기 바랍니다.
+이 튜토리얼에서는 쿠버네티스를 약간은 어려운 방법으로 설정하는 법을 배웁니다. 이 가이드는 쿠버네티스 클러스터를 생성하는 완전히 자동화된 커맨드를 찾으려는 사람들에게는 적합하지 않습니다. 만약 그런 커맨드를 찾고자 한다면 [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine) 또는 [Getting Started Guides](https://kubernetes.io/docs/setup)를 확인하시기 바랍니다.
 
 Kubernetes The Hard Way는 학습에 특화되어 있으며 이는 쿠버네티스 클러스터를 부트스트랩 하는데 필요한 각 task를 이해하는 데 긴 시간이 필요함을 의미합니다.
 
